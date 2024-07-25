@@ -9,7 +9,6 @@ from langchain_openai import ChatOpenAI
 
 from .image import ImageData
 
-
 def _parse_code(input: dict) -> dict:
     match = re.search(r"```(?:python)?\n(.*?)\n```", input["text"], re.DOTALL)
     if match:
@@ -225,7 +224,12 @@ class CadCodeGeneratorChain(SequentialChain):
                 )
             ],
         )
-        llm = ChatOpenAI(model="gpt-4o-2024-05-13", temperature=0.0, max_tokens=4096)
+        
+        llm = ChatOpenAI(
+            model="gpt-4o-2024-05-13", 
+            temperature=0.0, 
+            max_tokens=4096
+            )
 
         super().__init__(
             chains=[
@@ -294,7 +298,11 @@ class CadCodeRefinerChain(SequentialChain):
                 )
             ],
         )
-        llm = ChatOpenAI(model="gpt-4o-2024-05-13", temperature=0.0, max_tokens=4096)
+        llm = ChatOpenAI(
+            model="gpt-4o-2024-05-13", 
+            temperature=0.0, 
+            max_tokens=4096
+            )
 
         super().__init__(
             chains=[
@@ -317,18 +325,18 @@ class CadCodeRefinerChain(SequentialChain):
             verbose=True,
         )
 
-    def prep_inputs(self, inputs: Union[dict[str, Any], Any]) -> dict[str, str]:
-        assert (
-            "original_input" in inputs
-            and isinstance(inputs["original_input"], ImageData)
-            and "rendered_result" in inputs
-            and isinstance(inputs["rendered_result"], ImageData)
-            and "code" in inputs
-            and isinstance(inputs["code"], str)
-        ), "inputs must have 'original_input' and 'rendered_result' and 'code' keys"
-        inputs["original_image_type"] = inputs["original_input"].type
-        inputs["original_image_data"] = inputs["original_input"].data
-        inputs["rendered_image_type"] = inputs["rendered_result"].type
-        inputs["rendered_image_data"] = inputs["rendered_result"].data
-        inputs["code"] = inputs["code"]
-        return inputs
+    # def prep_inputs(self, inputs: Union[dict[str, Any], Any]) -> dict[str, str]:
+    #     assert (
+    #         "original_input" in inputs
+    #         and isinstance(inputs["original_input"], ImageData)
+    #         and "rendered_result" in inputs
+    #         and isinstance(inputs["rendered_result"], ImageData)
+    #         and "code" in inputs
+    #         and isinstance(inputs["code"], str)
+    #     ), "inputs must have 'original_input' and 'rendered_result' and 'code' keys"
+    #     inputs["original_image_type"] = inputs["original_input"].type
+    #     inputs["original_image_data"] = inputs["original_input"].data
+    #     inputs["rendered_image_type"] = inputs["rendered_result"].type
+    #     inputs["rendered_image_data"] = inputs["rendered_result"].data
+    #     inputs["code"] = inputs["code"]
+    #     return inputs

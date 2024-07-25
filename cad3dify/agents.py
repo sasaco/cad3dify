@@ -12,13 +12,23 @@ If it is difficult to make the code run successfully despite making corrections,
 
 
 def execute_python_code(code: str, only_execute: bool = False) -> str:
+    """
+    LLMエージェントにコードが正常に実行されるように修正してもらう。
+    修正の必要がないことがわかったとしても、コードを実行して正常に動作することを確認してもらう
+    修正しても正常に実行できない場合は、"I cannot fix it."
+    """
+
     tools = [PythonREPLTool()]
     if only_execute:
         return tools[0].run(code)
-    base_prompt = hub.pull("langchain-ai/react-agent-template")
+    base_prompt = hub.pull("langchain-ai/react-agent-template") # ハブからオブジェクトをプルし、LangChain オブジェクトとして返す
     prompt = base_prompt.partial(instructions=_instructions)
     agent = create_react_agent(
-        ChatOpenAI(model="gpt-4o-2024-05-13", temperature=0.0, max_tokens=4096),
+        ChatOpenAI(
+            model="gpt-4o-2024-05-13", 
+            temperature=0.0, 
+            max_tokens=4096
+        ),
         tools=tools,
         prompt=prompt,
     )

@@ -18,7 +18,7 @@ A STEP`file ("output.step") will be generated.
 ```bash
 cd scripts
 export OPENAI_API_KEY=<YOUR API KEY>
-python cli.py <2D CAD Image File>
+python main.py <2D CAD Image File>
 ```
 
 ## Demo
@@ -32,3 +32,4 @@ We will use the sample file [here](http://cad.wp.xdomain.jp/).
 ### Generated 3D CAD model
 
 ![output](sample_data/gen_result1.png)
+

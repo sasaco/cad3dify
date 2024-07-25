@@ -18,7 +18,6 @@ def index_map(index: int) -> str:
     else:
         return f"{index + 1}th"
 
-
 def generate_step_from_2d_cad_image(image_filepath: str, output_filepath: str, num_refinements: int = 3):
     """Generate a STEP file from a 2D CAD image
 
@@ -27,21 +26,28 @@ def generate_step_from_2d_cad_image(image_filepath: str, output_filepath: str, n
         output_filepath (str): Path to the output STEP file
     """
     image_data = ImageData.load_from_file(image_filepath)
+
+    # 2DのCAD画像を'cadquery'というpythonのCADライブラリを用いて、3DのCADモデルに変換するコードを生成し
+    # 生成した3Dモデルは`cadquery.exporters.export`関数を使ってSTEPファイルで出力
     chain = CadCodeGeneratorChain()
 
-    result = chain.invoke(image_data)["result"]
-    code = result.format(output_filename=output_filepath)
+    result: str = chain.invoke(image_data)["result"]
+    code = result.format(output_filename=output_filepath) # {output_filename}の部分をoutput_filepathに置き換える
     logger.info("1st code generation complete. Running code...")
     logger.debug("Generated 1st code:")
     logger.debug(code)
-    output = execute_python_code(code)
+    output = execute_python_code(code) # LLMエージェントにコードが正常に実行されるように修正
     logger.debug(output)
 
+
+    # 3DのCADモデルから得られる3Dビューの画像と2DのCAD画像を比較し、
+    # CADモデルを修正するためのコード修正を行う
     refiner_chain = CadCodeRefinerChain()
 
+    # num_refinements回 コード修正を行う
     for i in range(num_refinements):
         with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as f:
-            render_and_export_image(output_filepath, f.name)
+            render_and_export_image(output_filepath, f.name) # 3DのCADモデルを3Dビューの画像に変換する
             logger.info(f"Temporarily rendered image to {f.name}")
             rendered_image = ImageData.load_from_file(f.name)
             result = refiner_chain.invoke(
