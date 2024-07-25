@@ -14,8 +14,8 @@ def render_and_export_image(cat_filepath: str, output_filepath: str):
         output_filename (str): Path to the output PNG file
     """
     cad = cq.importers.importStep(cat_filepath)
-    with tempfile.NamedTemporaryFile(suffix=".svg", delete=True) as f:
-        exporters.export(cad, f.name)
-        drawing = svg2rlg(f.name)
+    path = "tmp/render_and_export_image.svg"
+    exporters.export(cad, path)
+    drawing = svg2rlg(path)
 
     renderPM.drawToFile(drawing, output_filepath, fmt="PNG")

@@ -46,16 +46,22 @@ def generate_step_from_2d_cad_image(image_filepath: str, output_filepath: str, n
 
     # num_refinements回 コード修正を行う
     for i in range(num_refinements):
-        with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as f:
-            render_and_export_image(output_filepath, f.name) # 3DのCADモデルを3Dビューの画像に変換する
-            logger.info(f"Temporarily rendered image to {f.name}")
-            rendered_image = ImageData.load_from_file(f.name)
-            result = refiner_chain.invoke(
-                {"code": code, "original_input": image_data, "rendered_result": rendered_image}
-            )["result"]
-            code = result.format(output_filename=output_filepath)
-            logger.info("Refined code generation complete. Running code...")
-            logger.debug(f"Generated {index_map(i)} refined code:")
-            logger.debug(code)
-            output = execute_python_code(code)
-            logger.debug(output)
+        path = "tmp/render_and_export_image.png"
+        render_and_export_image(output_filepath, path) # 3DのCADモデルを3Dビューの画像に変換する
+        logger.info(f"Temporarily rendered image to {path}")
+        rendered_image = ImageData.load_from_file(path)
+        result = refiner_chain.invoke({
+            "code": code, 
+            "original_input": image_data, 
+            "rendered_result": rendered_image,
+            "rendered_image_type": rendered_image.type,
+            "rendered_image_data": rendered_image.data,
+            "original_image_data": image_data.data,
+            "original_image_type": image_data.type
+        })["result"]
+        code = result.format(output_filename=output_filepath)
+        logger.info("Refined code generation complete. Running code...")
+        logger.debug(f"Generated {index_map(i)} refined code:")
+        logger.debug(code)
+        output = execute_python_code(code)
+        logger.debug(output)
